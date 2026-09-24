@@ -53,6 +53,15 @@
   .field-label{display:none;font-size:13px;color:var(--muted);margin-bottom:2px;}
   .val{font-size:19px;}
   .val.qty{color:var(--tape);font-weight:800;font-size:22px;}
+  .divider{
+    width:2px; align-self:stretch; background:repeating-linear-gradient(
+      to bottom, var(--kraft) 0 6px, transparent 6px 12px
+    ); justify-self:center; min-height:32px;
+  }
+  @media (max-width:720px){
+    .divider{ width:100%; height:2px; min-height:0; margin:2px 0;
+      background:repeating-linear-gradient(to right, var(--kraft) 0 6px, transparent 6px 12px); }
+  }
   mark{background:#ffe0a8;color:inherit;border-radius:3px;padding:0 3px;}
   .empty, .loading, .err{ text-align:center; padding:44px 16px; color:var(--muted); font-size:18px; }
   .err{color:var(--tape);}
@@ -139,17 +148,35 @@ function render(list){
     return;
   }
   const q = document.getElementById('search').value.trim();
-  const otherCols = headers.length - 1; // كل شي عدا الكود
-  box.innerHTML = list.map(r => `
+
+  // نحدد آخر عمود يخص "القبغ" وأول عمود يخص "القاعدة" لوضع فاصل بينهم
+  let lastQabaghIdx = -1, firstQaedaIdx = -1;
+  headers.forEach((h, i)=>{
+    if(h.includes('قبغ')) lastQabaghIdx = i;
+    if(h.includes('قاعدة') && firstQaedaIdx === -1) firstQaedaIdx = i;
+  });
+  const showDivider = lastQabaghIdx !== -1 && firstQaedaIdx !== -1 && firstQaedaIdx > lastQabaghIdx;
+
+  box.innerHTML = list.map(r => {
+    // الفاصل يظهر فقط إذا فعلاً فيه قيمة بأعمدة "القاعدة" بهذا الصف
+    const qaedaHasValue = showDivider && headers.some((h, i)=> h.includes('قاعدة') && (r[i]||'').trim() !== '');
+    const otherCols = headers.length - 1 + (qaedaHasValue ? 1 : 0);
+    const fields = headers.slice(1).map((h, i)=>{
+      const colIdx = i + 1;
+      const v = r[colIdx] || '';
+      const isQty = h.includes('عدد');
+      let html = `<span><span class="field-label">${h}</span><span class="val${isQty?' qty':''}">${hl(v, q)}</span></span>`;
+      if(qaedaHasValue && colIdx === firstQaedaIdx){
+        html = '<span class="divider"></span>' + html;
+      }
+      return html;
+    }).join('');
+    return `
     <div class="row" style="grid-template-columns:110px repeat(${Math.max(otherCols,1)}, 1fr)">
       <span class="code">${hl(r[0]||'', q)}</span>
-      ${headers.slice(1).map((h, i)=>{
-        const v = r[i+1] || '';
-        const isQty = h.includes('عدد');
-        return `<span><span class="field-label">${h}</span><span class="val${isQty?' qty':''}">${hl(v, q)}</span></span>`;
-      }).join('')}
-    </div>
-  `).join('');
+      ${fields}
+    </div>`;
+  }).join('');
 }
 
 function applyFilter(){
