@@ -7,17 +7,20 @@
 <style>
 :root{
   --bg:#f5f6fa; --card:#fff; --border:#dfe3ea; --head:#2f5aa8; --headtxt:#fff;
-  --text:#1c2333; --accent:#2f5aa8; --danger:#c0392b; --muted:#8a93a6;
+  --text:#1c2333; --accent:#2f5aa8; --muted:#8a93a6; --ok:#2e8b57; --err:#c0392b;
+  --mark-bg:#ffe08a; --mark-txt:#1c2333;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#14161c; --card:#1d2029; --border:#333846; --head:#3a63b0; --headtxt:#fff;
-    --text:#e7e9ee; --accent:#5b8ae0; --danger:#e06c5e; --muted:#8c93a3;
+    --text:#e7e9ee; --muted:#8c93a3; --accent:#5b8ae0; --ok:#4caf7d; --err:#e06c5e;
+    --mark-bg:#7a5c00; --mark-txt:#fff;
   }
 }
 :root[data-theme="dark"]{
   --bg:#14161c; --card:#1d2029; --border:#333846; --head:#3a63b0; --headtxt:#fff;
-  --text:#e7e9ee; --accent:#5b8ae0; --danger:#e06c5e; --muted:#8c93a3;
+  --text:#e7e9ee; --muted:#8c93a3; --accent:#5b8ae0; --ok:#4caf7d; --err:#e06c5e;
+  --mark-bg:#7a5c00; --mark-txt:#fff;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -28,149 +31,146 @@ body{
 }
 .wrap{max-width:1000px;margin:0 auto;padding:20px 16px 40px}
 h1{font-size:1.3rem;margin:0 0 4px}
-.sub{color:var(--muted);font-size:.85rem;margin:0 0 16px}
-.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.sub{color:var(--muted);font-size:.85rem;margin:0 0 14px}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
 button{
   font-family:inherit;font-size:.9rem;border:1px solid var(--border);
   background:var(--card);color:var(--text);padding:8px 14px;border-radius:8px;cursor:pointer;
 }
 button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-button.danger{color:var(--danger)}
+.status{font-size:.8rem;color:var(--muted)}
+.status.ok{color:var(--ok)}
+.status.err{color:var(--err)}
 .tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--card)}
 table{border-collapse:collapse;width:100%;min-width:700px}
-th{
-  background:var(--head);color:var(--headtxt);padding:10px 8px;font-size:.85rem;
-  position:sticky;top:0;white-space:nowrap;
+th{background:var(--head);color:var(--headtxt);padding:10px 8px;font-size:.85rem;white-space:nowrap}
+td{padding:9px 8px;border-bottom:1px solid var(--border);border-inline-start:1px solid var(--border);font-size:.9rem;text-align:center}
+tr:last-child td{border-bottom:none}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+#searchBox{
+  width:100%;padding:10px 14px;margin-bottom:8px;border:1px solid var(--border);
+  border-radius:8px;background:var(--card);color:var(--text);font-family:inherit;font-size:.95rem;
 }
-td{padding:0;border-bottom:1px solid var(--border);border-inline-start:1px solid var(--border)}
-td input{
-  width:100%;border:none;background:transparent;color:var(--text);padding:9px 8px;
-  font-family:inherit;font-size:.9rem;text-align:center;
-}
-td input:focus{outline:2px solid var(--accent);outline-offset:-2px;background:rgba(91,138,224,.08)}
-.rowcode input{font-weight:600}
-.delcol{width:40px;text-align:center}
-.delcol button{padding:4px 8px;font-size:.8rem}
-.status{margin-top:10px;font-size:.8rem;color:var(--muted)}
+#searchBox:focus{outline:2px solid var(--accent);outline-offset:-2px}
+.count{font-size:.78rem;color:var(--muted);margin-bottom:10px}
+mark{background:var(--mark-bg);color:var(--mark-txt);border-radius:3px;padding:0 2px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>📦 تفاصيل الكارتون والتكاليف</h1>
-  <p class="sub">التعديلات تُحفظ تلقائياً في هذا المتصفح</p>
+  <p class="sub">يقرأ البيانات مباشرة من ملف Google Sheets — أي تعديل بالشيت ينعكس هنا تلقائياً</p>
 
   <div class="toolbar">
-    <button class="primary" id="addRow">+ إضافة صف</button>
-    <button id="exportCsv">تصدير CSV</button>
-    <button class="danger" id="resetAll">تفريغ الكل</button>
+    <button class="primary" id="refreshBtn">🔄 تحديث الآن</button>
+    <span class="status" id="status">جاري التحميل...</span>
   </div>
+
+  <input type="search" id="searchBox" placeholder="🔍 بحث... (CODE، قياس، أي كلمة)" />
+  <div class="count" id="countMsg"></div>
 
   <div class="tablewrap">
-    <table id="tbl">
-      <thead>
-        <tr>
-          <th>CODE</th>
-          <th>القياس الأول</th>
-          <th>عدد المطبوع</th>
-          <th>القياس الثاني</th>
-          <th>عدد المطبوع</th>
-          <th>سلفان وجهين</th>
-          <th class="delcol"></th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
+    <table id="tbl" style="display:none">
+      <thead><tr id="headRow"></tr></thead>
+      <tbody id="bodyRow"></tbody>
     </table>
+    <div class="empty" id="emptyMsg">لا توجد بيانات بعد</div>
   </div>
-  <div class="status" id="status"></div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
-const COLS = ["code","size1","count1","size2","count2","selophane"];
-const DEFAULT = [
-  {code:"A003", size1:"70*100", count1:"4 علبة تنزل", size2:"", count2:"", selophane:""},
-  {code:"A005", size1:"70*70", count1:"1", size2:"", count2:"", selophane:""},
-  {code:"A006", size1:"100*70 قبغ", count1:"6", size2:"100*55 قاعدة", count2:"تنزل 2", selophane:""},
-];
-const KEY = "carton_data_v1";
-let rows = [];
+// رابط CSV المنشور من Google Sheets (File → Share → Publish to web)
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTJQBm-Syhly2MwKYgVSZAI3c_uHQRs4FSyZJv8-oKEf87Adm4f6HdRLf5XUz5b51_0beVms8Mbo-gp/pub?output=csv&cachebust=" + Date.now();
 
-function load(){
-  try{
-    const raw = localStorage.getItem(KEY);
-    rows = raw ? JSON.parse(raw) : DEFAULT.map(r=>({...r}));
-  }catch(e){ rows = DEFAULT.map(r=>({...r})); }
-}
-function save(){
-  try{ localStorage.setItem(KEY, JSON.stringify(rows)); setStatus("تم الحفظ ✓"); }
-  catch(e){ setStatus("تعذّر الحفظ"); }
-}
-function setStatus(msg){
-  const el = document.getElementById("status");
-  el.textContent = msg;
-  clearTimeout(setStatus._t);
-  setStatus._t = setTimeout(()=>{el.textContent="";}, 1500);
+const statusEl = document.getElementById("status");
+const tbl = document.getElementById("tbl");
+const emptyMsg = document.getElementById("emptyMsg");
+const headRow = document.getElementById("headRow");
+const bodyRow = document.getElementById("bodyRow");
+
+function setStatus(msg, cls){
+  statusEl.textContent = msg;
+  statusEl.className = "status " + (cls || "");
 }
 
-function render(){
-  const tbody = document.getElementById("tbody");
-  tbody.innerHTML = "";
-  rows.forEach((row, idx)=>{
+let allRows = []; // بدون صف العناوين
+let headers = [];
+const countMsg = document.getElementById("countMsg");
+const searchBox = document.getElementById("searchBox");
+
+function highlight(text, q){
+  if(!q) return text;
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if(idx === -1) return text;
+  return text.slice(0,idx) + "<mark>" + text.slice(idx, idx+q.length) + "</mark>" + text.slice(idx+q.length);
+}
+
+function renderTable(rows, q){
+  if(!rows.length){
+    tbl.style.display = "none";
+    emptyMsg.style.display = "block";
+    emptyMsg.textContent = q ? "لا نتائج مطابقة لـ: " + q : "لا توجد بيانات بعد";
+    countMsg.textContent = "";
+    return;
+  }
+  emptyMsg.style.display = "none";
+  tbl.style.display = "table";
+  bodyRow.innerHTML = "";
+  rows.forEach(r=>{
     const tr = document.createElement("tr");
-    COLS.forEach(col=>{
+    headers.forEach((_, i)=>{
       const td = document.createElement("td");
-      if(col==="code") td.className="rowcode";
-      const input = document.createElement("input");
-      input.value = row[col] || "";
-      input.addEventListener("input", e=>{
-        rows[idx][col] = e.target.value;
-        save();
-      });
-      td.appendChild(input);
+      const val = r[i] || "";
+      td.innerHTML = q ? highlight(val, q) : val;
       tr.appendChild(td);
     });
-    const delTd = document.createElement("td");
-    delTd.className = "delcol";
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "✕";
-    delBtn.title = "حذف الصف";
-    delBtn.addEventListener("click", ()=>{
-      rows.splice(idx,1);
-      save(); render();
-    });
-    delTd.appendChild(delBtn);
-    tr.appendChild(delTd);
-    tbody.appendChild(tr);
+    bodyRow.appendChild(tr);
   });
+  countMsg.textContent = q ? `${rows.length} نتيجة مطابقة` : `${rows.length} صف`;
 }
 
-document.getElementById("addRow").addEventListener("click", ()=>{
-  rows.push({code:"", size1:"", count1:"", size2:"", count2:"", selophane:""});
-  save(); render();
-});
+function applySearch(){
+  const q = searchBox.value.trim();
+  if(!q){ renderTable(allRows, ""); return; }
+  const ql = q.toLowerCase();
+  const filtered = allRows.filter(r => r.some(cell => (cell||"").toLowerCase().includes(ql)));
+  renderTable(filtered, q);
+}
 
-document.getElementById("resetAll").addEventListener("click", ()=>{
-  if(confirm("متأكد تريد تفريغ كل البيانات؟")){
-    rows = [];
-    save(); render();
-  }
-});
-
-document.getElementById("exportCsv").addEventListener("click", ()=>{
-  const headers = ["CODE","القياس الاول","عدد المطبوع","القياس الثاني","عدد المطبوع","سلفان وجهين"];
-  let csv = "\uFEFF" + headers.join(",") + "\n";
-  rows.forEach(r=>{
-    csv += COLS.map(c=>`"${(r[c]||"").replace(/"/g,'""')}"`).join(",") + "\n";
+function setData(rows){
+  if(!rows.length){ allRows = []; headers = []; renderTable([], ""); return; }
+  headers = rows[0];
+  headRow.innerHTML = "";
+  headers.forEach(h=>{
+    const th = document.createElement("th");
+    th.textContent = h;
+    headRow.appendChild(th);
   });
-  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = "تفاصيل_الكارتون.csv";
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-});
+  allRows = rows.slice(1).filter(r => !r.every(c => !c || !c.trim()));
+  applySearch();
+}
 
-load();
-render();
+async function loadData(){
+  setStatus("جاري التحديث...");
+  try{
+    const res = await fetch(CSV_URL, {cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    const text = await res.text();
+    const parsed = Papa.parse(text.trim(), {skipEmptyLines:false});
+    setData(parsed.data);
+    const now = new Date().toLocaleTimeString("ar");
+    setStatus("✓ آخر تحديث: " + now, "ok");
+  }catch(err){
+    setStatus("تعذّر التحديث — تأكد أن الشيت لسه منشور (Publish to web) وأن الرابط صحيح", "err");
+  }
+}
+
+document.getElementById("refreshBtn").addEventListener("click", loadData);
+searchBox.addEventListener("input", applySearch);
+
+loadData();
+setInterval(loadData, 30000); // تحديث تلقائي كل 30 ثانية
 </script>
 </body>
 </html>
