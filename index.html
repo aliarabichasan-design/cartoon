@@ -149,32 +149,32 @@ function render(list){
   }
   const q = document.getElementById('search').value.trim();
 
-  // نحدد آخر عمود يخص "القبغ" وأول عمود يخص "القاعدة" لوضع فاصل بينهم
   let lastQabaghIdx = -1, firstQaedaIdx = -1;
   headers.forEach((h, i)=>{
     if(h.includes('قبغ')) lastQabaghIdx = i;
     if(h.includes('قاعدة') && firstQaedaIdx === -1) firstQaedaIdx = i;
   });
-  const showDivider = lastQabaghIdx !== -1 && firstQaedaIdx !== -1 && firstQaedaIdx > lastQabaghIdx;
 
   box.innerHTML = list.map(r => {
-    // الفاصل يظهر فقط إذا فعلاً فيه قيمة بأعمدة "القاعدة" بهذا الصف
-    const qaedaHasValue = showDivider && headers.some((h, i)=> h.includes('قاعدة') && (r[i]||'').trim() !== '');
-    const otherCols = headers.length - 1 + (qaedaHasValue ? 1 : 0);
-    const fields = headers.slice(1).map((h, i)=>{
+    // نبني فقط الحقول اللي فعلاً فيها قيمة (غير الكود، اللي دايم يظهر)
+    const parts = [];
+    let dividerInserted = false;
+    headers.slice(1).forEach((h, i)=>{
       const colIdx = i + 1;
-      const v = r[colIdx] || '';
-      const isQty = h.includes('عدد');
-      let html = `<span><span class="field-label">${h}</span><span class="val${isQty?' qty':''}">${hl(v, q)}</span></span>`;
-      if(qaedaHasValue && colIdx === firstQaedaIdx){
-        html = '<span class="divider"></span>' + html;
+      const v = (r[colIdx] || '').trim();
+      if(!v) return; // تجاهل أي عمود فاضي (زي القبغ أو القاعدة إذا ما انعبّت)
+      if(!dividerInserted && colIdx === firstQaedaIdx && lastQabaghIdx !== -1 && firstQaedaIdx > lastQabaghIdx){
+        parts.push('<span class="divider"></span>');
+        dividerInserted = true;
       }
-      return html;
-    }).join('');
+      const isQty = h.includes('عدد');
+      parts.push(`<span><span class="field-label">${h}</span><span class="val${isQty?' qty':''}">${hl(v, q)}</span></span>`);
+    });
+    const colCount = parts.length || 1;
     return `
-    <div class="row" style="grid-template-columns:110px repeat(${Math.max(otherCols,1)}, 1fr)">
+    <div class="row" style="grid-template-columns:110px repeat(${colCount}, 1fr)">
       <span class="code">${hl(r[0]||'', q)}</span>
-      ${fields}
+      ${parts.join('')}
     </div>`;
   }).join('');
 }
