@@ -3,174 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>تفاصيل الكارتون والتكاليف</title>
+<title>سجل الكراتين والتكاليف</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#f5f6fa; --card:#fff; --border:#dfe3ea; --head:#2f5aa8; --headtxt:#fff;
-  --text:#1c2333; --accent:#2f5aa8; --muted:#8a93a6; --ok:#2e8b57; --err:#c0392b;
-  --mark-bg:#ffe08a; --mark-txt:#1c2333;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#14161c; --card:#1d2029; --border:#333846; --head:#3a63b0; --headtxt:#fff;
-    --text:#e7e9ee; --muted:#8c93a3; --accent:#5b8ae0; --ok:#4caf7d; --err:#e06c5e;
-    --mark-bg:#7a5c00; --mark-txt:#fff;
+  :root{
+    --paper:#f3efe6; --ink:#211d16; --kraft:#7a5230; --tape:#c8501f;
+    --line:#d9d0bd; --muted:#8a8172; --card:#fffdf8;
   }
-}
-:root[data-theme="dark"]{
-  --bg:#14161c; --card:#1d2029; --border:#333846; --head:#3a63b0; --headtxt:#fff;
-  --text:#e7e9ee; --muted:#8c93a3; --accent:#5b8ae0; --ok:#4caf7d; --err:#e06c5e;
-  --mark-bg:#7a5c00; --mark-txt:#fff;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0; background:var(--bg); color:var(--text);
-  font-family:"Segoe UI","Tahoma",Arial,sans-serif;
-  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
-}
-.wrap{max-width:1000px;margin:0 auto;padding:20px 16px 40px}
-h1{font-size:1.3rem;margin:0 0 4px}
-.sub{color:var(--muted);font-size:.85rem;margin:0 0 14px}
-.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
-button{
-  font-family:inherit;font-size:.9rem;border:1px solid var(--border);
-  background:var(--card);color:var(--text);padding:8px 14px;border-radius:8px;cursor:pointer;
-}
-button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-.status{font-size:.8rem;color:var(--muted)}
-.status.ok{color:var(--ok)}
-.status.err{color:var(--err)}
-.tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--card)}
-table{border-collapse:collapse;width:100%;min-width:700px}
-th{background:var(--head);color:var(--headtxt);padding:10px 8px;font-size:.85rem;white-space:nowrap}
-td{padding:9px 8px;border-bottom:1px solid var(--border);border-inline-start:1px solid var(--border);font-size:.9rem;text-align:center}
-tr:last-child td{border-bottom:none}
-.empty{padding:30px;text-align:center;color:var(--muted)}
-#searchBox{
-  width:100%;padding:10px 14px;margin-bottom:8px;border:1px solid var(--border);
-  border-radius:8px;background:var(--card);color:var(--text);font-family:inherit;font-size:.95rem;
-}
-#searchBox:focus{outline:2px solid var(--accent);outline-offset:-2px}
-.count{font-size:.78rem;color:var(--muted);margin-bottom:10px}
-mark{background:var(--mark-bg);color:var(--mark-txt);border-radius:3px;padding:0 2px}
+  *{box-sizing:border-box;}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--paper);
+    background-image:repeating-linear-gradient(135deg, rgba(122,82,48,.05) 0 2px, transparent 2px 14px);
+    color:var(--ink); font-family:'Cairo',sans-serif; min-height:100vh;
+    padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  header{ padding:28px 20px 18px; border-bottom:3px solid var(--ink); background:var(--card); }
+  .wrap{max-width:960px;margin:0 auto;}
+  h1{ margin:0 0 6px; font-size:clamp(28px,4.5vw,40px); font-weight:800; letter-spacing:.5px; }
+  h1 span{color:var(--tape);}
+  .sub{ color:var(--muted); font-size:16px; display:flex; gap:14px; flex-wrap:wrap; }
+  .search-zone{ max-width:960px; margin:22px auto 0; padding:0 20px; }
+  .search-box{
+    display:flex; align-items:center; gap:10px; background:var(--card);
+    border:2px solid var(--ink); border-radius:10px; padding:14px 18px;
+    box-shadow:4px 4px 0 var(--kraft);
+  }
+  .search-box svg{flex:none;opacity:.6;width:22px;height:22px;}
+  .search-box input{
+    border:none; outline:none; background:transparent; font-family:'Cairo',sans-serif;
+    font-size:20px; width:100%; color:var(--ink);
+  }
+  .search-box input::placeholder{color:#a89f8e;}
+  main{max-width:960px;margin:24px auto 60px;padding:0 20px;}
+  .count{font-size:15px;color:var(--muted);margin:0 0 14px;font-family:'IBM Plex Mono',monospace;}
+  .rows{display:flex;flex-direction:column;gap:12px;}
+  .row{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:18px 20px; display:grid; gap:14px; align-items:center;
+    transition:border-color .15s;
+  }
+  .row:hover{border-color:var(--kraft);}
+  .code{
+    font-family:'IBM Plex Mono',monospace; font-weight:600; background:var(--ink);
+    color:var(--paper); padding:6px 12px; border-radius:6px; text-align:center;
+    font-size:17px; justify-self:start;
+  }
+  .field-label{display:none;font-size:13px;color:var(--muted);margin-bottom:2px;}
+  .val{font-size:19px;}
+  .val.qty{color:var(--tape);font-weight:800;font-size:22px;}
+  mark{background:#ffe0a8;color:inherit;border-radius:3px;padding:0 3px;}
+  .empty, .loading, .err{ text-align:center; padding:44px 16px; color:var(--muted); font-size:18px; }
+  .err{color:var(--tape);}
+  footer{ text-align:center; font-size:13px; color:var(--muted); padding:18px; font-family:'IBM Plex Mono',monospace; }
+  @media (max-width:720px){
+    .row{grid-template-columns:1fr !important;gap:8px;}
+    .code{justify-self:start;}
+    .field-label{display:block;}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>📦 تفاصيل الكارتون والتكاليف</h1>
-  <p class="sub">يقرأ البيانات مباشرة من ملف Google Sheets — أي تعديل بالشيت ينعكس هنا تلقائياً</p>
-
-  <div class="toolbar">
-    <button class="primary" id="refreshBtn">🔄 تحديث الآن</button>
-    <span class="status" id="status">جاري التحميل...</span>
+<header>
+  <div class="wrap">
+    <h1>سجل <span>الكراتين</span> والتكاليف</h1>
+    <div class="sub"><span id="lastUpdate">جارٍ التحميل…</span></div>
   </div>
+</header>
 
-  <input type="search" id="searchBox" placeholder="🔍 بحث... (CODE، قياس، أي كلمة)" />
-  <div class="count" id="countMsg"></div>
-
-  <div class="tablewrap">
-    <table id="tbl" style="display:none">
-      <thead><tr id="headRow"></tr></thead>
-      <tbody id="bodyRow"></tbody>
-    </table>
-    <div class="empty" id="emptyMsg">لا توجد بيانات بعد</div>
+<div class="search-zone">
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="search" type="text" placeholder="ابحث بالكود، المقاس، الكمية أو النوع…" autocomplete="off">
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<main>
+  <p class="count" id="count"></p>
+  <div class="rows" id="rows"><div class="loading">جارٍ جلب البيانات من الشيت…</div></div>
+</main>
+
+<footer>يتحدّث تلقائيًا من Google Sheets كل ٣٠ ثانية</footer>
+
 <script>
-// رابط CSV المنشور من Google Sheets (File → Share → Publish to web)
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTJQBm-Syhly2MwKYgVSZAI3c_uHQRs4FSyZJv8-oKEf87Adm4f6HdRLf5XUz5b51_0beVms8Mbo-gp/pub?output=csv&cachebust=" + Date.now();
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTJQBm-Syhly2MwKYgVSZAI3c_uHQRs4FSyZJv8-oKEf87Adm4f6HdRLf5XUz5b51_0beVms8Mbo-gp/pub?output=csv";
 
-const statusEl = document.getElementById("status");
-const tbl = document.getElementById("tbl");
-const emptyMsg = document.getElementById("emptyMsg");
-const headRow = document.getElementById("headRow");
-const bodyRow = document.getElementById("bodyRow");
-
-function setStatus(msg, cls){
-  statusEl.textContent = msg;
-  statusEl.className = "status " + (cls || "");
-}
-
-let allRows = []; // بدون صف العناوين
+let allRows = [];
 let headers = [];
-const countMsg = document.getElementById("countMsg");
-const searchBox = document.getElementById("searchBox");
 
-function highlight(text, q){
-  if(!q) return text;
-  const idx = text.toLowerCase().indexOf(q.toLowerCase());
-  if(idx === -1) return text;
-  return text.slice(0,idx) + "<mark>" + text.slice(idx, idx+q.length) + "</mark>" + text.slice(idx+q.length);
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for(let i=0;i<text.length;i++){
+    const c = text[i], n = text[i+1];
+    if(inQuotes){
+      if(c === '"' && n === '"'){ field += '"'; i++; }
+      else if(c === '"'){ inQuotes = false; }
+      else field += c;
+    } else {
+      if(c === '"') inQuotes = true;
+      else if(c === ','){ row.push(field); field = ""; }
+      else if(c === '\n' || c === '\r'){
+        if(field.length || row.length){ row.push(field); rows.push(row); row = []; field = ""; }
+        if(c === '\r' && n === '\n') i++;
+      } else field += c;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(v => v.trim() !== ""));
 }
 
-function renderTable(rows, q){
-  if(!rows.length){
-    tbl.style.display = "none";
-    emptyMsg.style.display = "block";
-    emptyMsg.textContent = q ? "لا نتائج مطابقة لـ: " + q : "لا توجد بيانات بعد";
-    countMsg.textContent = "";
+function uniqueLabels(raw){
+  const seen = {};
+  return raw.map(h=>{
+    const base = (h||"").trim() || "—";
+    seen[base] = (seen[base]||0) + 1;
+    return seen[base] > 1 ? `${base} (${seen[base]})` : base;
+  });
+}
+
+function hl(v, q){
+  if(!q) return v;
+  const idx = v.toLowerCase().indexOf(q.toLowerCase());
+  if(idx === -1) return v;
+  return v.slice(0,idx) + '<mark>' + v.slice(idx, idx+q.length) + '</mark>' + v.slice(idx+q.length);
+}
+
+function render(list){
+  const box = document.getElementById('rows');
+  const count = document.getElementById('count');
+  count.textContent = list.length + " سطر" + (list.length === 1 ? "" : "ات");
+  if(!list.length){
+    box.innerHTML = '<div class="empty">لا توجد نتائج مطابقة</div>';
     return;
   }
-  emptyMsg.style.display = "none";
-  tbl.style.display = "table";
-  bodyRow.innerHTML = "";
-  rows.forEach(r=>{
-    const tr = document.createElement("tr");
-    headers.forEach((_, i)=>{
-      const td = document.createElement("td");
-      const val = r[i] || "";
-      td.innerHTML = q ? highlight(val, q) : val;
-      tr.appendChild(td);
-    });
-    bodyRow.appendChild(tr);
-  });
-  countMsg.textContent = q ? `${rows.length} نتيجة مطابقة` : `${rows.length} صف`;
+  const q = document.getElementById('search').value.trim();
+  const otherCols = headers.length - 1; // كل شي عدا الكود
+  box.innerHTML = list.map(r => `
+    <div class="row" style="grid-template-columns:110px repeat(${Math.max(otherCols,1)}, 1fr)">
+      <span class="code">${hl(r[0]||'', q)}</span>
+      ${headers.slice(1).map((h, i)=>{
+        const v = r[i+1] || '';
+        const isQty = h.includes('عدد');
+        return `<span><span class="field-label">${h}</span><span class="val${isQty?' qty':''}">${hl(v, q)}</span></span>`;
+      }).join('')}
+    </div>
+  `).join('');
 }
 
-function applySearch(){
-  const q = searchBox.value.trim();
-  if(!q){ renderTable(allRows, ""); return; }
-  const ql = q.toLowerCase();
-  const filtered = allRows.filter(r => r.some(cell => (cell||"").toLowerCase().includes(ql)));
-  renderTable(filtered, q);
+function applyFilter(){
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  if(!q){ render(allRows); return; }
+  render(allRows.filter(r => r.some(v => (v||'').toLowerCase().includes(q))));
 }
 
-function setData(rows){
-  if(!rows.length){ allRows = []; headers = []; renderTable([], ""); return; }
-  headers = rows[0];
-  headRow.innerHTML = "";
-  headers.forEach(h=>{
-    const th = document.createElement("th");
-    th.textContent = h;
-    headRow.appendChild(th);
-  });
-  allRows = rows.slice(1).filter(r => !r.every(c => !c || !c.trim()));
-  applySearch();
-}
-
-async function loadData(){
-  setStatus("جاري التحديث...");
+async function fetchCSVText(){
   try{
     const res = await fetch(CSV_URL, {cache:"no-store"});
-    if(!res.ok) throw new Error("HTTP " + res.status);
-    const text = await res.text();
-    const parsed = Papa.parse(text.trim(), {skipEmptyLines:false});
-    setData(parsed.data);
-    const now = new Date().toLocaleTimeString("ar");
-    setStatus("✓ آخر تحديث: " + now, "ok");
-  }catch(err){
-    setStatus("تعذّر التحديث — تأكد أن الشيت لسه منشور (Publish to web) وأن الرابط صحيح", "err");
+    if(res.ok) return await res.text();
+  } catch(e){ /* fall through */ }
+  const proxied = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(CSV_URL), {cache:"no-store"});
+  if(!proxied.ok) throw new Error("تعذر الوصول للشيت");
+  return await proxied.text();
+}
+
+async function load(){
+  try{
+    const text = await fetchCSVText();
+    const parsed = parseCSV(text);
+    if(!parsed.length){ allRows = []; headers = []; render([]); return; }
+    headers = uniqueLabels(parsed[0]);
+    allRows = parsed.slice(1);
+    document.getElementById('lastUpdate').textContent =
+      "آخر تحديث: " + new Date().toLocaleString('ar-EG', {dateStyle:'medium', timeStyle:'short'});
+    applyFilter();
+  } catch(e){
+    document.getElementById('rows').innerHTML = '<div class="err">تعذر تحميل البيانات. تأكد من نشر الشيت (File → Share → Publish to web) وإعادة المحاولة.</div>';
+    document.getElementById('lastUpdate').textContent = "فشل التحديث";
   }
 }
 
-document.getElementById("refreshBtn").addEventListener("click", loadData);
-searchBox.addEventListener("input", applySearch);
-
-loadData();
-setInterval(loadData, 30000); // تحديث تلقائي كل 30 ثانية
+document.getElementById('search').addEventListener('input', applyFilter);
+load();
+setInterval(load, 30000);
 </script>
 </body>
 </html>
