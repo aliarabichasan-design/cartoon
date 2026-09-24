@@ -2,243 +2,175 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>سجل الكراتين والتكاليف</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تفاصيل الكارتون والتكاليف</title>
 <style>
-  :root{
-    --paper:#f3efe6;
-    --ink:#211d16;
-    --kraft:#7a5230;
-    --tape:#c8501f;
-    --line:#d9d0bd;
-    --muted:#8a8172;
-    --card:#fffdf8;
+:root{
+  --bg:#f5f6fa; --card:#fff; --border:#dfe3ea; --head:#2f5aa8; --headtxt:#fff;
+  --text:#1c2333; --accent:#2f5aa8; --danger:#c0392b; --muted:#8a93a6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14161c; --card:#1d2029; --border:#333846; --head:#3a63b0; --headtxt:#fff;
+    --text:#e7e9ee; --accent:#5b8ae0; --danger:#e06c5e; --muted:#8c93a3;
   }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--paper);
-    background-image:
-      repeating-linear-gradient(135deg, rgba(122,82,48,.05) 0 2px, transparent 2px 14px);
-    color:var(--ink);
-    font-family:'Cairo',sans-serif;
-    min-height:100vh;
-  }
-  header{
-    padding:28px 20px 18px;
-    border-bottom:3px solid var(--ink);
-    background:var(--card);
-  }
-  .wrap{max-width:880px;margin:0 auto;}
-  h1{
-    margin:0 0 4px;
-    font-size:clamp(24px,4vw,34px);
-    font-weight:800;
-    letter-spacing:.5px;
-  }
-  h1 span{color:var(--tape);}
-  .sub{
-    color:var(--muted);
-    font-size:14px;
-    display:flex;
-    gap:14px;
-    flex-wrap:wrap;
-  }
-  .search-zone{
-    max-width:880px;
-    margin:20px auto 0;
-    padding:0 20px;
-  }
-  .search-box{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    background:var(--card);
-    border:2px solid var(--ink);
-    border-radius:10px;
-    padding:12px 16px;
-    box-shadow:4px 4px 0 var(--kraft);
-  }
-  .search-box svg{flex:none;opacity:.6;}
-  .search-box input{
-    border:none;
-    outline:none;
-    background:transparent;
-    font-family:'Cairo',sans-serif;
-    font-size:17px;
-    width:100%;
-    color:var(--ink);
-  }
-  .search-box input::placeholder{color:#a89f8e;}
-  main{max-width:880px;margin:22px auto 60px;padding:0 20px;}
-  .count{font-size:13px;color:var(--muted);margin:0 0 12px;font-family:'IBM Plex Mono',monospace;}
-  .rows{display:flex;flex-direction:column;gap:10px;}
-  .row{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:8px;
-    padding:14px 16px;
-    display:grid;
-    grid-template-columns:90px 1fr 1fr 1fr;
-    gap:10px;
-    align-items:center;
-    transition:border-color .15s;
-  }
-  .row:hover{border-color:var(--kraft);}
-  .code{
-    font-family:'IBM Plex Mono',monospace;
-    font-weight:600;
-    background:var(--ink);
-    color:var(--paper);
-    padding:4px 8px;
-    border-radius:5px;
-    text-align:center;
-    font-size:13px;
-    justify-self:start;
-  }
-  .field-label{display:none;font-size:11px;color:var(--muted);}
-  .val{font-size:15px;}
-  .val.qty{color:var(--tape);font-weight:600;}
-  mark{background:#ffe0a8;color:inherit;border-radius:3px;padding:0 2px;}
-  .empty, .loading, .err{
-    text-align:center;
-    padding:40px 16px;
-    color:var(--muted);
-    font-size:15px;
-  }
-  .err{color:var(--tape);}
-  footer{
-    text-align:center;
-    font-size:12px;
-    color:var(--muted);
-    padding:16px;
-    font-family:'IBM Plex Mono',monospace;
-  }
-  @media (max-width:620px){
-    .row{grid-template-columns:1fr;gap:6px;}
-    .code{justify-self:start;}
-    .field-label{display:block;}
-  }
+}
+:root[data-theme="dark"]{
+  --bg:#14161c; --card:#1d2029; --border:#333846; --head:#3a63b0; --headtxt:#fff;
+  --text:#e7e9ee; --accent:#5b8ae0; --danger:#e06c5e; --muted:#8c93a3;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Segoe UI","Tahoma",Arial,sans-serif;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.3rem;margin:0 0 4px}
+.sub{color:var(--muted);font-size:.85rem;margin:0 0 16px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+button{
+  font-family:inherit;font-size:.9rem;border:1px solid var(--border);
+  background:var(--card);color:var(--text);padding:8px 14px;border-radius:8px;cursor:pointer;
+}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+button.danger{color:var(--danger)}
+.tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:700px}
+th{
+  background:var(--head);color:var(--headtxt);padding:10px 8px;font-size:.85rem;
+  position:sticky;top:0;white-space:nowrap;
+}
+td{padding:0;border-bottom:1px solid var(--border);border-inline-start:1px solid var(--border)}
+td input{
+  width:100%;border:none;background:transparent;color:var(--text);padding:9px 8px;
+  font-family:inherit;font-size:.9rem;text-align:center;
+}
+td input:focus{outline:2px solid var(--accent);outline-offset:-2px;background:rgba(91,138,224,.08)}
+.rowcode input{font-weight:600}
+.delcol{width:40px;text-align:center}
+.delcol button{padding:4px 8px;font-size:.8rem}
+.status{margin-top:10px;font-size:.8rem;color:var(--muted)}
 </style>
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <h1>سجل <span>الكراتين</span> والتكاليف</h1>
-    <div class="sub">
-      <span id="lastUpdate">جارٍ التحميل…</span>
-    </div>
-  </div>
-</header>
+<div class="wrap">
+  <h1>📦 تفاصيل الكارتون والتكاليف</h1>
+  <p class="sub">التعديلات تُحفظ تلقائياً في هذا المتصفح</p>
 
-<div class="search-zone">
-  <div class="search-box">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-    <input id="search" type="text" placeholder="ابحث بالكود، المقاس، الكمية أو النوع…" autocomplete="off">
+  <div class="toolbar">
+    <button class="primary" id="addRow">+ إضافة صف</button>
+    <button id="exportCsv">تصدير CSV</button>
+    <button class="danger" id="resetAll">تفريغ الكل</button>
   </div>
+
+  <div class="tablewrap">
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th>CODE</th>
+          <th>القياس الأول</th>
+          <th>عدد المطبوع</th>
+          <th>القياس الثاني</th>
+          <th>عدد المطبوع</th>
+          <th>سلفان وجهين</th>
+          <th class="delcol"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div class="status" id="status"></div>
 </div>
 
-<main>
-  <p class="count" id="count"></p>
-  <div class="rows" id="rows"><div class="loading">جارٍ جلب البيانات من الشيت…</div></div>
-</main>
-
-<footer>يتحدّث تلقائيًا من Google Sheets عند كل فتح للصفحة</footer>
-
 <script>
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTJQBm-Syhly2MwKYgVSZAI3c_uHQRs4FSyZJv8-oKEf87Adm4f6HdRLf5XUz5b51_0beVms8Mbo-gp/pub?output=csv";
-const HEADERS = ["الكود","المقاس","الكمية","النوع"];
+const COLS = ["code","size1","count1","size2","count2","selophane"];
+const DEFAULT = [
+  {code:"A003", size1:"70*100", count1:"4 علبة تنزل", size2:"", count2:"", selophane:""},
+  {code:"A005", size1:"70*70", count1:"1", size2:"", count2:"", selophane:""},
+  {code:"A006", size1:"100*70 قبغ", count1:"6", size2:"100*55 قاعدة", count2:"تنزل 2", selophane:""},
+];
+const KEY = "carton_data_v1";
+let rows = [];
 
-let allRows = [];
-
-function parseCSV(text){
-  const rows = [];
-  let row = [], field = "", inQuotes = false;
-  for(let i=0;i<text.length;i++){
-    const c = text[i], n = text[i+1];
-    if(inQuotes){
-      if(c === '"' && n === '"'){ field += '"'; i++; }
-      else if(c === '"'){ inQuotes = false; }
-      else field += c;
-    } else {
-      if(c === '"') inQuotes = true;
-      else if(c === ','){ row.push(field); field = ""; }
-      else if(c === '\n' || c === '\r'){
-        if(field.length || row.length){ row.push(field); rows.push(row); row = []; field = ""; }
-        if(c === '\r' && n === '\n') i++;
-      } else field += c;
-    }
-  }
-  if(field.length || row.length){ row.push(field); rows.push(row); }
-  return rows.filter(r => r.some(v => v.trim() !== ""));
-}
-
-function render(list){
-  const box = document.getElementById('rows');
-  const count = document.getElementById('count');
-  count.textContent = list.length + " سطر" + (list.length === 1 ? "" : "ات");
-  if(!list.length){
-    box.innerHTML = '<div class="empty">لا توجد نتائج مطابقة</div>';
-    return;
-  }
-  const q = document.getElementById('search').value.trim();
-  const hl = (v) => {
-    if(!q) return v;
-    const idx = v.toLowerCase().indexOf(q.toLowerCase());
-    if(idx === -1) return v;
-    return v.slice(0,idx) + '<mark>' + v.slice(idx, idx+q.length) + '</mark>' + v.slice(idx+q.length);
-  };
-  box.innerHTML = list.map(r => `
-    <div class="row">
-      <span class="code">${hl(r[0]||'')}</span>
-      <span><span class="field-label">${HEADERS[1]}</span><span class="val">${hl(r[1]||'')}</span></span>
-      <span><span class="field-label">${HEADERS[2]}</span><span class="val qty">${hl(r[2]||'')}</span></span>
-      <span><span class="field-label">${HEADERS[3]}</span><span class="val">${hl(r[3]||'')}</span></span>
-    </div>
-  `).join('');
-}
-
-function applyFilter(){
-  const q = document.getElementById('search').value.trim().toLowerCase();
-  if(!q){ render(allRows); return; }
-  render(allRows.filter(r => r.some(v => (v||'').toLowerCase().includes(q))));
-}
-
-async function fetchCSVText(){
-  // Try direct fetch first (this is what will run once hosted on GitHub Pages)
+function load(){
   try{
-    const res = await fetch(CSV_URL, {cache:"no-store"});
-    if(res.ok) return await res.text();
-  } catch(e){ /* likely blocked by file:// / CORS, fall through to proxy */ }
-
-  // Fallback for local testing (file://) via a public CORS proxy
-  const proxied = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(CSV_URL), {cache:"no-store"});
-  if(!proxied.ok) throw new Error("تعذر الوصول للشيت");
-  return await proxied.text();
+    const raw = localStorage.getItem(KEY);
+    rows = raw ? JSON.parse(raw) : DEFAULT.map(r=>({...r}));
+  }catch(e){ rows = DEFAULT.map(r=>({...r})); }
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(rows)); setStatus("تم الحفظ ✓"); }
+  catch(e){ setStatus("تعذّر الحفظ"); }
+}
+function setStatus(msg){
+  const el = document.getElementById("status");
+  el.textContent = msg;
+  clearTimeout(setStatus._t);
+  setStatus._t = setTimeout(()=>{el.textContent="";}, 1500);
 }
 
-async function load(){
-  try{
-    const text = await fetchCSVText();
-    let rows = parseCSV(text);
-    // drop header row if it matches known labels
-    if(rows.length && HEADERS.some(h => rows[0].join('|').includes(h))){
-      rows = rows.slice(1);
-    }
-    allRows = rows;
-    document.getElementById('lastUpdate').textContent =
-      "آخر تحديث: " + new Date().toLocaleString('ar-EG', {dateStyle:'medium', timeStyle:'short'});
-    render(allRows);
-  } catch(e){
-    document.getElementById('rows').innerHTML = '<div class="err">تعذر تحميل البيانات. تأكد من نشر الشيت (File → Share → Publish to web) وإعادة المحاولة.</div>';
-    document.getElementById('lastUpdate').textContent = "فشل التحديث";
+function render(){
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+  rows.forEach((row, idx)=>{
+    const tr = document.createElement("tr");
+    COLS.forEach(col=>{
+      const td = document.createElement("td");
+      if(col==="code") td.className="rowcode";
+      const input = document.createElement("input");
+      input.value = row[col] || "";
+      input.addEventListener("input", e=>{
+        rows[idx][col] = e.target.value;
+        save();
+      });
+      td.appendChild(input);
+      tr.appendChild(td);
+    });
+    const delTd = document.createElement("td");
+    delTd.className = "delcol";
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "✕";
+    delBtn.title = "حذف الصف";
+    delBtn.addEventListener("click", ()=>{
+      rows.splice(idx,1);
+      save(); render();
+    });
+    delTd.appendChild(delBtn);
+    tr.appendChild(delTd);
+    tbody.appendChild(tr);
+  });
+}
+
+document.getElementById("addRow").addEventListener("click", ()=>{
+  rows.push({code:"", size1:"", count1:"", size2:"", count2:"", selophane:""});
+  save(); render();
+});
+
+document.getElementById("resetAll").addEventListener("click", ()=>{
+  if(confirm("متأكد تريد تفريغ كل البيانات؟")){
+    rows = [];
+    save(); render();
   }
-}
+});
 
-document.getElementById('search').addEventListener('input', applyFilter);
+document.getElementById("exportCsv").addEventListener("click", ()=>{
+  const headers = ["CODE","القياس الاول","عدد المطبوع","القياس الثاني","عدد المطبوع","سلفان وجهين"];
+  let csv = "\uFEFF" + headers.join(",") + "\n";
+  rows.forEach(r=>{
+    csv += COLS.map(c=>`"${(r[c]||"").replace(/"/g,'""')}"`).join(",") + "\n";
+  });
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "تفاصيل_الكارتون.csv";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
 load();
+render();
 </script>
 </body>
 </html>
